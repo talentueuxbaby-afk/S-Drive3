@@ -19,8 +19,7 @@ const WAVE_URL =
   'https://pay.wave.com/m/M_ci_kpNTVGT9JGah/c/ci/?amount=1000';
 
 const WHATSAPP_NUMBER =
-  process.env.WHATSAPP_NUMBER ||
-  '';
+  '2250152171974';
 
 const SESSION_SECRET =
   process.env.SESSION_SECRET ||
@@ -31,8 +30,17 @@ const SESSION_SECRET =
    APPLICATION
 ========================================================= */
 
-app.use(express.json({ limit: '1mb' }));
-app.use(express.urlencoded({ extended: false }));
+app.use(
+  express.json({
+    limit: '1mb'
+  })
+);
+
+app.use(
+  express.urlencoded({
+    extended: false
+  })
+);
 
 app.use(
   session({
@@ -43,8 +51,12 @@ app.use(
     cookie: {
       httpOnly: true,
       sameSite: 'lax',
-      secure: process.env.NODE_ENV === 'production',
-      maxAge: 7 * 24 * 60 * 60 * 1000
+
+      secure:
+        process.env.NODE_ENV === 'production',
+
+      maxAge:
+        7 * 24 * 60 * 60 * 1000
     }
   })
 );
@@ -54,26 +66,21 @@ app.use(
    BASE DE DONNÉES
 ========================================================= */
 
+const dbPath =
+  path.join(__dirname, 'sdrive.db');
+
 const db =
-  new Database(
-    path.join(__dirname, 'sdrive.db')
-  );
+  new Database(dbPath);
 
 db.pragma('foreign_keys = ON');
 
 db.exec(`
   CREATE TABLE IF NOT EXISTS analyses (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-
-    user_name TEXT NOT NULL,
-    phone TEXT NOT NULL,
-
     odds_type INTEGER NOT NULL
       CHECK(odds_type IN (2, 10)),
-
     status TEXT NOT NULL
       DEFAULT 'payment_pending',
-
     created_at TEXT NOT NULL
       DEFAULT CURRENT_TIMESTAMP
   );
@@ -89,10 +96,6 @@ function whatsappLink(message) {
   const number =
     String(WHATSAPP_NUMBER)
       .replace(/[^\d]/g, '');
-
-  if (!number) {
-    return null;
-  }
 
   return (
     'https://wa.me/' +
@@ -130,8 +133,11 @@ app.get('/', (req, res) => {
 
 <title>S-Drive — Analyse des matchs</title>
 
-
 <style>
+
+/* =========================================================
+   VARIABLES
+========================================================= */
 
 :root {
 
@@ -139,15 +145,18 @@ app.get('/', (req, res) => {
   --navy2: #0B223D;
   --card: #102B4C;
   --line: #23486B;
-
   --blue: #00BFFF;
   --green: #21C55D;
   --red: #DC2626;
-
   --white: #FFFFFF;
   --muted: #AFC1D4;
 
 }
+
+
+/* =========================================================
+   RESET
+========================================================= */
 
 * {
   box-sizing: border-box;
@@ -168,7 +177,8 @@ body {
     Helvetica,
     sans-serif;
 
-  color: var(--white);
+  color:
+    var(--white);
 
   background:
     radial-gradient(
@@ -179,6 +189,11 @@ body {
 
 }
 
+
+/* =========================================================
+   CONTENEUR
+========================================================= */
+
 .container {
 
   width:
@@ -187,48 +202,75 @@ body {
       520px
     );
 
-  margin: auto;
+  margin:
+    auto;
 
   padding:
     18px 0 35px;
 
 }
 
+
+/* =========================================================
+   CENTRAGE
+========================================================= */
+
 .center {
   text-align: center;
 }
 
+
+/* =========================================================
+   LOGO / BALLON
+========================================================= */
+
 .logo {
 
-  width: 100px;
-  height: 100px;
+  width:
+    100px;
+
+  height:
+    100px;
 
   margin:
     15px auto 8px;
 
-  display: flex;
+  display:
+    flex;
 
-  justify-content: center;
-  align-items: center;
+  justify-content:
+    center;
 
-  border-radius: 50%;
+  align-items:
+    center;
 
-  font-size: 64px;
+  border-radius:
+    50%;
+
+  font-size:
+    64px;
 
   background:
     rgba(0,191,255,.10);
 
   border:
-    1px solid rgba(0,191,255,.25);
+    1px solid
+    rgba(0,191,255,.25);
 
 }
+
+
+/* =========================================================
+   TITRES
+========================================================= */
 
 h1 {
 
   margin:
     8px 0 5px;
 
-  font-size: 32px;
+  font-size:
+    32px;
 
 }
 
@@ -237,17 +279,25 @@ h2 {
   margin:
     0 0 16px;
 
-  font-size: 21px;
+  font-size:
+    21px;
 
 }
 
 .muted {
 
-  color: var(--muted);
+  color:
+    var(--muted);
 
-  line-height: 1.55;
+  line-height:
+    1.55;
 
 }
+
+
+/* =========================================================
+   CARTES
+========================================================= */
 
 .card {
 
@@ -255,81 +305,80 @@ h2 {
     rgba(16,43,76,.96);
 
   border:
-    1px solid var(--line);
+    1px solid
+    var(--line);
 
-  border-radius: 20px;
+  border-radius:
+    20px;
 
-  padding: 20px;
+  padding:
+    20px;
 
-  margin: 15px 0;
+  margin:
+    15px 0;
 
   box-shadow:
-    0 8px 25px rgba(0,0,0,.18);
+    0 8px 25px
+    rgba(0,0,0,.18);
 
 }
 
-input {
 
-  width: 100%;
-
-  padding: 15px;
-
-  margin: 7px 0;
-
-  border-radius: 12px;
-
-  border:
-    1px solid #3C5F7E;
-
-  background:
-    var(--navy2);
-
-  color: var(--white);
-
-  font-size: 16px;
-
-  outline: none;
-
-}
-
-input:focus {
-  border-color: var(--blue);
-}
+/* =========================================================
+   BOUTONS
+========================================================= */
 
 .btn {
 
-  width: 100%;
+  width:
+    100%;
 
-  min-height: 52px;
+  min-height:
+    52px;
 
-  padding: 14px;
+  padding:
+    14px;
 
-  border-radius: 14px;
+  border-radius:
+    14px;
 
-  font-weight: 800;
+  font-weight:
+    800;
 
-  font-size: 15px;
+  font-size:
+    15px;
 
-  border: 0;
+  border:
+    0;
 
-  margin: 8px 0;
+  margin:
+    8px 0;
 
-  cursor: pointer;
+  cursor:
+    pointer;
 
-  text-decoration: none;
+  text-decoration:
+    none;
 
-  display: flex;
+  display:
+    flex;
 
-  justify-content: center;
+  justify-content:
+    center;
 
-  align-items: center;
+  align-items:
+    center;
 
-  text-align: center;
+  text-align:
+    center;
 
 }
 
 .btn:active {
-  transform: scale(.98);
+
+  transform:
+    scale(.98);
+
 }
 
 .primary {
@@ -361,47 +410,52 @@ input:focus {
     #FFFFFF;
 
   border:
-    1px solid #315D82;
+    1px solid
+    #315D82;
 
 }
 
-.danger {
 
-  background:
-    #7F1D1D;
-
-  color:
-    #FFFFFF;
-
-}
+/* =========================================================
+   CHOIX DES COTES
+========================================================= */
 
 .choice {
 
   border:
-    1px solid #315D82;
+    1px solid
+    #315D82;
 
   background:
     #0B223D;
 
-  padding: 17px;
+  padding:
+    17px;
 
-  border-radius: 15px;
+  border-radius:
+    15px;
 
-  margin: 9px 0;
+  margin:
+    9px 0;
 
-  cursor: pointer;
+  cursor:
+    pointer;
 
-  transition: .2s ease;
+  transition:
+    .2s ease;
 
 }
 
 .choice strong {
 
-  display: block;
+  display:
+    block;
 
-  font-size: 18px;
+  font-size:
+    18px;
 
-  margin-bottom: 6px;
+  margin-bottom:
+    6px;
 
 }
 
@@ -410,7 +464,8 @@ input:focus {
   color:
     var(--muted);
 
-  line-height: 1.4;
+  line-height:
+    1.4;
 
 }
 
@@ -427,113 +482,210 @@ input:focus {
 
 }
 
+
+/* =========================================================
+   PRIX
+========================================================= */
+
 .price {
 
-  font-size: 28px;
+  font-size:
+    28px;
 
-  font-weight: 900;
+  font-weight:
+    900;
 
-  text-align: center;
+  text-align:
+    center;
 
-  margin: 17px 0;
+  margin:
+    17px 0;
 
 }
 
+
+/* =========================================================
+   NOTICES
+========================================================= */
+
 .notice {
 
-  padding: 14px;
+  padding:
+    14px;
 
   border-left:
-    3px solid var(--blue);
+    3px solid
+    var(--blue);
 
   background:
     #0C2745;
 
-  border-radius: 8px;
+  border-radius:
+    8px;
 
-  line-height: 1.55;
+  line-height:
+    1.55;
 
-  margin: 10px 0;
+  margin:
+    10px 0;
 
 }
 
+
+/* =========================================================
+   STATUT
+========================================================= */
+
 .status {
 
-  margin-top: 12px;
+  margin-top:
+    12px;
 
   color:
     var(--muted);
 
-  text-align: center;
+  text-align:
+    center;
 
-  min-height: 24px;
+  min-height:
+    24px;
 
-  line-height: 1.4;
+  line-height:
+    1.4;
 
 }
 
 .status.success {
-  color: #6EE7A0;
+
+  color:
+    #6EE7A0;
+
 }
 
 .status.error {
-  color: #FF8A8A;
-}
 
-.user-box {
-
-  background:
-    rgba(7,26,45,.65);
-
-  border:
-    1px solid var(--line);
-
-  padding: 14px;
-
-  border-radius: 14px;
-
-  margin-bottom: 15px;
-
-  text-align: center;
+  color:
+    #FF8A8A;
 
 }
+
+
+/* =========================================================
+   PARTAGE
+========================================================= */
 
 .share-box {
 
-  display: grid;
+  display:
+    grid;
 
   grid-template-columns:
     1fr 1fr;
 
-  gap: 8px;
+  gap:
+    8px;
 
 }
 
+
+/* =========================================================
+   HIDDEN
+========================================================= */
+
+.hidden {
+
+  display:
+    none !important;
+
+}
+
+
+/* =========================================================
+   SPINNER
+========================================================= */
+
+.spinner {
+
+  width:
+    18px;
+
+  height:
+    18px;
+
+  border:
+    3px solid
+    rgba(0,0,0,.25);
+
+  border-top-color:
+    currentColor;
+
+  border-radius:
+    50%;
+
+  animation:
+    spin .8s linear infinite;
+
+  margin-right:
+    8px;
+
+}
+
+@keyframes spin {
+
+  to {
+    transform:
+      rotate(360deg);
+  }
+
+}
+
+
+/* =========================================================
+   FOOTER
+========================================================= */
+
 footer {
 
-  text-align: center;
+  text-align:
+    center;
 
   color:
     var(--muted);
 
-  font-size: 12px;
+  font-size:
+    12px;
 
-  margin-top: 25px;
+  margin-top:
+    25px;
 
 }
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
 
 @media (max-width: 360px) {
 
   .container {
-    width: calc(100% - 20px);
+
+    width:
+      calc(100% - 20px);
+
   }
 
   h1 {
-    font-size: 28px;
+
+    font-size:
+      28px;
+
   }
 
   .card {
-    padding: 16px;
+
+    padding:
+      16px;
+
   }
 
 }
@@ -549,7 +701,7 @@ footer {
 
 
 <!-- =====================================================
-     TABLEAU DE BORD DIRECT
+     ACCUEIL
 ====================================================== -->
 
 <section id="dashboard">
@@ -558,7 +710,7 @@ footer {
   <div class="center">
 
     <div class="logo">
-      🌱
+      ⚽
     </div>
 
     <h1>
@@ -568,19 +720,6 @@ footer {
     <p class="muted">
       Analyse professionnelle de vos matchs
     </p>
-
-  </div>
-
-
-  <div class="user-box">
-
-    👤 Mode test
-
-    <br>
-
-    <span class="muted">
-      Bienvenue sur S-Drive
-    </span>
 
   </div>
 
@@ -665,6 +804,7 @@ footer {
     <!-- WHATSAPP -->
 
     <button
+      id="whatsappButton"
       class="btn primary"
       type="button"
       onclick="sendMatchScreenshot()"
@@ -805,17 +945,6 @@ footer {
   </div>
 
 
-  <!-- DECONNEXION TEST -->
-
-  <button
-    class="btn danger"
-    type="button"
-    onclick="resetTest()"
-  >
-    🔄 Réinitialiser le test
-  </button>
-
-
 </section>
 
 
@@ -879,7 +1008,7 @@ function selectOdds(type) {
 
 
 /* =====================================================
-   DEMANDE D'ANALYSE
+   CREER LA DEMANDE
 ====================================================== */
 
 async function sendMatchScreenshot() {
@@ -895,6 +1024,18 @@ async function sendMatchScreenshot() {
 
   status.className =
     'status';
+
+
+  const button =
+    document.getElementById(
+      'whatsappButton'
+    );
+
+
+  button.disabled = true;
+
+  button.textContent =
+    'Préparation...';
 
 
   try {
@@ -955,7 +1096,7 @@ async function sendMatchScreenshot() {
 
 
     status.textContent =
-      'Demande créée. Préparez maintenant votre capture des matchs.';
+      'Demande créée. Ouverture de WhatsApp...';
 
     status.className =
       'status success';
@@ -963,22 +1104,16 @@ async function sendMatchScreenshot() {
 
     if (data.whatsapp_url) {
 
-      setTimeout(() => {
-
-        window.open(
-          data.whatsapp_url,
-          '_blank'
-        );
-
-      }, 300);
+      window.location.href =
+        data.whatsapp_url;
 
     } else {
 
       status.textContent =
-        'Demande créée. WhatsApp n’est pas encore configuré sur le serveur.';
+        'Impossible de préparer WhatsApp.';
 
       status.className =
-        'status success';
+        'status error';
 
     }
 
@@ -992,6 +1127,13 @@ async function sendMatchScreenshot() {
 
     status.className =
       'status error';
+
+  } finally {
+
+    button.disabled = false;
+
+    button.textContent =
+      '📸 Envoyer la capture des matchs';
 
   }
 
@@ -1010,14 +1152,10 @@ async function copyAppLink() {
     );
 
 
-  const link =
-    window.location.origin;
-
-
   try {
 
     await navigator.clipboard.writeText(
-      link
+      window.location.origin
     );
 
 
@@ -1087,36 +1225,6 @@ async function shareApp() {
 
 }
 
-
-/* =====================================================
-   RESET TEST
-====================================================== */
-
-function resetTest() {
-
-  document
-    .getElementById('analysisStatus')
-    .textContent =
-      '';
-
-  document
-    .getElementById('shareStatus')
-    .textContent =
-      '';
-
-  selectOdds(2);
-
-}
-
-
-/* =====================================================
-   DEMARRAGE
-====================================================== */
-
-console.log(
-  'S-Drive — mode test activé'
-);
-
 </script>
 
 </body>
@@ -1159,31 +1267,15 @@ app.post(
       }
 
 
-      /*
-       * UTILISATEUR DE TEST
-       *
-       * L'inscription est désactivée
-       * temporairement.
-       */
-
-      const testName =
-        'Utilisateur test';
-
-      const testPhone =
-        '0000000000';
-
-
       const result =
         db
           .prepare(`
             INSERT INTO analyses
-              (user_name, phone, odds_type, status)
+              (odds_type, status)
             VALUES
-              (?, ?, ?, 'payment_pending')
+              (?, 'payment_pending')
           `)
           .run(
-            testName,
-            testPhone,
             oddsType
           );
 
@@ -1194,8 +1286,6 @@ app.post(
           '',
           'Je viens de créer une demande d’analyse.',
           '',
-          'Client : ' + testName,
-          'Téléphone : ' + testPhone,
           'Type : Cote ' + oddsType,
           'Référence : SD-' + result.lastInsertRowid,
           '',
@@ -1256,7 +1346,8 @@ app.get(
 
     res.json({
 
-      success: true,
+      success:
+        true,
 
       message:
         'S-Drive fonctionne correctement.',
@@ -1316,10 +1407,6 @@ app.listen(
 
     console.log(
       'S-Drive démarré'
-    );
-
-    console.log(
-      'Mode : TEST'
     );
 
     console.log(
